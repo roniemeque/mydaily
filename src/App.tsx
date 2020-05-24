@@ -11,7 +11,10 @@ import PostList from "./PostList";
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: new HttpLink({
-    uri: "/graphql",
+    uri:
+      process.env.NODE_ENV === "development"
+        ? "/graphql"
+        : "https://app.dailynow.co",
   }),
 });
 
