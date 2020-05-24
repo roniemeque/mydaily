@@ -33,8 +33,8 @@ const PostList: FC = () => {
     variables: {
       params: {
         latest: latestTiming,
-        page: 1,
-        pageSize: 30,
+        page: 0,
+        pageSize: 10,
         sortBy: "popularity",
       },
     },
