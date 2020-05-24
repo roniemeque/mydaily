@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
+import { fetchApi } from "./helpers/graphql";
 
 interface Post {
   id: string;
@@ -26,33 +27,15 @@ const POSTS_QUERY = `
 `;
 
 const fetchPosts = async (): Promise<Post[]> => {
-  const {
-    data: { latest },
-  } = await (
-    await fetch(
-      process.env.NODE_ENV === "development"
-        ? "/graphql"
-        : "https://cors-anywhere.herokuapp.com/https://app.dailynow.co/graphql",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          query: POSTS_QUERY,
-          variables: {
-            params: {
-              latest: latestTiming,
-              page: 0,
-              pageSize: 10,
-              sortBy: "popularity",
-            },
-          },
-        }),
-      }
-    )
-  ).json();
+  const { latest } = await fetchApi(POSTS_QUERY, {
+    params: {
+      latest: latestTiming,
+      page: 0,
+      pageSize: 10,
+      sortBy: "popularity",
+    },
+  });
+
   return latest;
 };
 
