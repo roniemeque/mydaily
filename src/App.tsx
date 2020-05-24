@@ -14,7 +14,7 @@ const client = new ApolloClient({
     uri:
       process.env.NODE_ENV === "development"
         ? "/graphql"
-        : "https://app.dailynow.co",
+        : "https://cors-anywhere.herokuapp.com/https://app.dailynow.co/graphql",
   }),
 });
 
