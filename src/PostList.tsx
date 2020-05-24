@@ -1,5 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 interface Post {
   id: string;
@@ -9,47 +8,65 @@ interface Post {
 
 const latestTiming = new Date().toISOString();
 
-const POSTS_QUERY = gql`
+const POSTS_QUERY = `
   query Latest($params: QueryPostInput) {
     latest(params: $params) {
       id
       url
       title
-      readTime
-      tags
-      publication {
-        id
-        name
-        image
-      }
+      # readTime
+      # tags
+      # publication {
+      #   id
+      #   name
+      #   image
+      # }
     }
   }
 `;
 
+const fetchPosts = async (): Promise<Post[]> => {
+  const {
+    data: { latest },
+  } = await (
+    await fetch(
+      process.env.NODE_ENV === "development"
+        ? "/graphql"
+        : "https://cors-anywhere.herokuapp.com/https://app.dailynow.co/graphql",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          query: POSTS_QUERY,
+          variables: {
+            params: {
+              latest: latestTiming,
+              page: 0,
+              pageSize: 10,
+              sortBy: "popularity",
+            },
+          },
+        }),
+      }
+    )
+  ).json();
+  return latest;
+};
+
 const PostList: FC = () => {
-  const { loading, error, data } = useQuery<{
-    latest: Post[];
-  }>(POSTS_QUERY, {
-    variables: {
-      params: {
-        latest: latestTiming,
-        page: 0,
-        pageSize: 10,
-        sortBy: "popularity",
-      },
-    },
-  });
+  const [posts, setPosts] = useState<Post[]>([]);
 
-  if (loading) return <p>loading...</p>;
-  if (error || !data) return <p>error check console</p>;
-
-  const { latest } = data;
-  console.log(latest);
+  useEffect(() => {
+    fetchPosts().then((data) => setPosts(data));
+  }, []);
 
   return (
     <div>
       <ul>
-        {latest.map((post) => (
+        {posts.map((post) => (
           <li key={post.id}>
             <a
               target="_blank"
