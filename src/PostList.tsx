@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { fetchApi } from "./helpers/graphql";
 import { getItemStorage, setItemStorage } from "./helpers/localstorage";
+import styled from "@emotion/styled";
 
 const MINUTES_TO_EXPIRE = 5;
 
@@ -8,6 +9,7 @@ interface Post {
   id: string;
   title: string;
   url: string;
+  image: string;
 }
 
 const latestTiming = new Date().toISOString();
@@ -18,6 +20,7 @@ const POSTS_QUERY = `
       id
       url
       title
+      image
       # readTime
       # tags
       # publication {
@@ -34,7 +37,7 @@ const fetchPosts = async (): Promise<Post[]> => {
     params: {
       latest: latestTiming,
       page: 0,
-      pageSize: 10,
+      pageSize: 20,
       sortBy: "popularity",
     },
   });
@@ -61,7 +64,7 @@ const PostList: FC = () => {
   }, []);
 
   return (
-    <div>
+    <PostListStyled>
       <ul>
         {posts.map((post) => (
           <li key={post.id}>
@@ -71,13 +74,42 @@ const PostList: FC = () => {
               title={post.title}
               href={post.url}
             >
-              {post.title}
+              <PostCard>
+                <img src={post.image} alt={post.title} />
+                <h2>{post.title}</h2>
+              </PostCard>
             </a>
           </li>
         ))}
       </ul>
-    </div>
+    </PostListStyled>
   );
 };
+
+const PostListStyled = styled.div`
+  ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 16rem));
+    justify-content: space-around;
+    gap: 1rem;
+    row-gap: 3rem;
+    list-style: none;
+  }
+`;
+
+const PostCard = styled.div`
+  display: grid;
+  gap: 0.5rem;
+  grid-template-rows: 10rem auto;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.5rem;
+  }
+  h2 {
+    font-size: 1.1rem;
+  }
+`;
 
 export default PostList;
