@@ -2,15 +2,9 @@ import React, { FC, useEffect, useState } from "react";
 import { fetchApi } from "./helpers/graphql";
 import { getItemStorage, setItemStorage } from "./helpers/localstorage";
 import styled from "@emotion/styled";
+import PostCard from "./PostCard";
 
 const MINUTES_TO_EXPIRE = 5;
-
-interface Post {
-  id: string;
-  title: string;
-  url: string;
-  image: string;
-}
 
 const latestTiming = new Date().toISOString();
 
@@ -22,12 +16,11 @@ const POSTS_QUERY = `
       title
       image
       # readTime
-      # tags
-      # publication {
-      #   id
-      #   name
-      #   image
-      # }
+      tags
+      publication {
+        id
+        name
+      }
     }
   }
 `;
@@ -47,7 +40,7 @@ const fetchPosts = async (): Promise<Post[]> => {
 
 const PostList: FC = () => {
   const [posts, setPosts] = useState<Post[]>(
-    getItemStorage("posts", 1000 * 60 * MINUTES_TO_EXPIRE) ?? []
+    getItemStorage("posts", 1000 * 60 * MINUTES_TO_EXPIRE) ?? [],
   );
 
   useEffect(() => {
@@ -64,52 +57,31 @@ const PostList: FC = () => {
   }, []);
 
   return (
-    <PostListStyled>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              title={post.title}
-              href={post.url}
-            >
-              <PostCard>
-                <img src={post.image} alt={post.title} />
-                <h2>{post.title}</h2>
-              </PostCard>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </PostListStyled>
+    <List>
+      {posts.map((post) => (
+        <li key={post.id}>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            title={post.title}
+            href={post.url}
+          >
+            <PostCard post={post}>
+            </PostCard>
+          </a>
+        </li>
+      ))}
+    </List>
   );
 };
 
-const PostListStyled = styled.div`
-  ul {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 16rem));
-    justify-content: space-around;
-    gap: 1rem;
-    row-gap: 3rem;
-    list-style: none;
-  }
-`;
-
-const PostCard = styled.div`
+const List = styled.ul`
   display: grid;
-  gap: 0.5rem;
-  grid-template-rows: 10rem auto;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0.5rem;
-  }
-  h2 {
-    font-size: 1.1rem;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 16rem));
+  justify-content: space-around;
+  gap: 1rem;
+  row-gap: 3rem;
+  list-style: none;
 `;
 
 export default PostList;
