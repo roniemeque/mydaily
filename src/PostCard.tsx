@@ -19,6 +19,10 @@ const Card = styled.div`
   display: grid;
   gap: 0.5rem;
   grid-template-rows: 10rem auto;
+  transition: all .3s;
+  &:hover{
+    transform: translateY(-2px);
+  }
   img {
     width: 100%;
     height: 100%;
