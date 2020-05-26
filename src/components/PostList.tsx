@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
-import { fetchApi } from "./helpers/graphql";
-import { getItemStorage, setItemStorage } from "./helpers/localstorage";
+import { fetchApi } from "../helpers/graphql";
+import { getItemStorage, setItemStorage } from "../helpers/localstorage";
 import styled from "@emotion/styled";
 import PostCard from "./PostCard";
 
