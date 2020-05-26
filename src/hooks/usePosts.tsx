@@ -36,25 +36,27 @@ const fetchPosts = async (): Promise<Post[]> => {
   return latest;
 };
 
-const usePosts = (): [Post[]] => {
+const usePosts = (): [Post[], () => any] => {
   const [posts, setPosts] = useState<Post[]>(
     getItemStorage("posts", 1000 * 60 * MINUTES_TO_EXPIRE) ?? [],
   );
 
+  const loadPosts = async () => {
+    const data = await fetchPosts();
+    setPosts(data);
+    setItemStorage("posts", data);
+  };
+
   useEffect(() => {
     if (!posts.length) {
-      fetchPosts().then((data) => {
-        console.log("fetching new posts");
-
-        setPosts(data);
-        setItemStorage("posts", data);
-      });
+      console.log("fetching new posts");
+      loadPosts();
     } else {
       console.log("got from localstorage");
     }
-  }, []);
+  }, ["a"]);
 
-  return [posts];
+  return [posts, loadPosts];
 };
 
 export default usePosts;

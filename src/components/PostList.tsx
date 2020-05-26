@@ -4,7 +4,7 @@ import usePosts from "../hooks/usePosts";
 import PostCard from "./PostCard";
 
 const PostList: FC = () => {
-  const [posts] = usePosts();
+  const [posts, loadPosts] = usePosts();
 
   return (
     <List>
@@ -21,6 +21,7 @@ const PostList: FC = () => {
           </a>
         </li>
       ))}
+      <span onClick={() => loadPosts()}>reload</span>
     </List>
   );
 };
